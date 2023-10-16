@@ -38,16 +38,15 @@ class App():
                 pygame.quit()
             elif event.type == self.user_event:
                 self.anim_trigger = True
+
     
             
     def set_timer(self):
         self.user_event = pygame.USEREVENT + 0
-        self.fast_user_event = pygame.USEREVENT + 1
         self.anim_trigger = False
-        #self.fast_anim_trigger = False
+        self.fast_anim_trigger = False
         pygame.time.set_timer(self.user_event, ANIM_TIME_INTERVAL)
-        #pygame.time.set_timer(self.fast_user_event, FAST_ANIM_TIME_INTERVAL)
-
+ 
 
     def get_opposite_scene(self):
         pygame.time.delay(250)

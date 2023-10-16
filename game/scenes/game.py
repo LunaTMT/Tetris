@@ -56,7 +56,9 @@ class GameScene:
         return [[0 for c in range(COLUMNS)] for r in range(ROWS)]
 
     def update(self):
+        
         if self.app.anim_trigger:
+            self.check_full_lines()
             self.tetromino.update()
             self.check_tetrimino_landing()
         self.all_sprites.update()
@@ -67,9 +69,26 @@ class GameScene:
 
     def check_tetrimino_landing(self):
         if self.tetromino.landing:
+            self.speed_up = False
             self.put_tetromino_blocks_in_array()
             self.tetromino = Tetromino(self)
     
+    def check_full_lines(self):
+        row = ROWS - 1
+        for r in range(ROWS-1, -1, -1):
+            for c in range(COLUMNS):
+                self.field_array[row][c] = self.field_array[r][c]
+
+                if self.field_array[r][c]:
+                    self.field_array[row][c].pos = vec(c, r)
+            
+            if sum(map(bool, self.field_array[r])) < COLUMNS:
+                row -= 1
+            else:
+                for c in range(COLUMNS):
+                    self.field_array[row][c].alive = False
+                    self.field_array[row][c] = 0
+
     def handle_events(self, event):
         keys = pygame.key.get_pressed()
         
@@ -79,7 +98,10 @@ class GameScene:
             self.tetromino.move(direction='right')
         elif keys[pygame.K_DOWN]:
             self.tetromino.move(direction='down')
-
+        
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            self.tetromino.rotate()
+        
         self.return_button.handle_event(event)
 
 
