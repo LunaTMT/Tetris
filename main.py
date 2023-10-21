@@ -1,19 +1,20 @@
 import pygame
-from game.scenes.game import GameScene
+from game.scenes.game import GameScene, Text
 from game.scenes.menu import MainMenuScene  
 
 from game.settings import *
 
 
 pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Tetris")
 
 class App():
 
     def __init__(self) -> None:
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.game_scene = GameScene(self)
         self.current_scene = self.main_menu_scene = MainMenuScene(self)
+        
         self.clock = pygame.time.Clock()
         self.running = True
         self.set_timer()
@@ -23,8 +24,7 @@ class App():
         while self.running:
             self.check_events()
             self.current_scene.update() 
-            self.current_scene.draw(screen)  
-
+            self.current_scene.draw(self.screen)  
             pygame.display.flip()  
             self.clock.tick(FPS)  
         pygame.quit()
@@ -55,7 +55,8 @@ class App():
         else:
             self.current_scene = self.game_scene
 
-       
+    def reinitialise_game_scene(self):
+        self.game_scene = GameScene(self)
 
 
 if __name__ == "__main__":

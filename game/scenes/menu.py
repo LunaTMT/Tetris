@@ -1,6 +1,7 @@
 import pygame
 from game import settings, colours
 
+
 pygame.mixer.init()  
 
 class MainMenuScene:
@@ -89,7 +90,9 @@ class MainMenuScene:
         match self.option_chose:
             case "Start Game":
                 self.option_chose = None
+                self.app.reinitialise_game_scene()
                 self.app.get_opposite_scene()
+                
             case "Options":
                 self.show_options()
             case "Quit":
@@ -97,7 +100,6 @@ class MainMenuScene:
 
 
     def show_options(self):
-        print("showing Options")
         self.options_menu = True
         self.buttons = self.option_buttons
         pass
@@ -144,17 +146,18 @@ class OptionButton(MenuButton):
         self.CLICK.play()
         match self.text:
             case "Large":
-                settings.set_screen(1000, 800)
-            case "Medium":
                 settings.set_screen(900, 700)
+            case "Medium":
+                settings.set_screen(800, 600)
             case "Small":
-                settings.set_screen(800, 600)  
+                settings.set_screen(700, 500)  
         settings.update_variables()
         pygame.display.set_mode((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT))
         self.menu.initialise_fonts()
         self.menu.initialise_buttons()
         self.menu.return_button.initialise_position()
-        self.app.game_scene.initialise_game_borders()
+        
+        
 
 class ReturnButton:
     def __init__(self, menu):

@@ -11,17 +11,19 @@ class Block(pygame.sprite.Sprite):
         self.game = tetromino.game
         self.colour = colour
         self.alive = True
-        self.pos = vec(pos) + INIT_POS_OFFSET
+        self.pos = vec(pos) + settings.INIT_POS_OFFSET
+        self.next_pos = vec(pos) + settings.NEXT_POS_OFFSET
 
         super().__init__(tetromino.game.all_sprites)
-        self.image = pygame.Surface([BLOCK_WIDTH, BLOCK_HEIGHT])
-        pygame.draw.rect(self.image, colour, (1, 1, BLOCK_WIDTH-1, BLOCK_HEIGHT-1), border_radius=2)
+        self.image = pygame.Surface([settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT])
+        pygame.draw.rect(self.image, colour, (1, 1, settings.BLOCK_WIDTH-1, settings.BLOCK_HEIGHT-1), border_radius=2)
         self.rect = self.image.get_rect()
 
     
 
     def set_rect_pos(self):
-        self.rect.topleft = (self.game.tetris_x_start + (self.pos[0] * BLOCK_WIDTH), self.pos[1] * BLOCK_HEIGHT)
+        pos = [self.next_pos, self.pos][self.tetromino.current]
+        self.rect.topleft = (self.game.tetris_x_start + (pos[0] * settings.BLOCK_WIDTH), pos[1] * settings.BLOCK_HEIGHT)
 
     def update(self):
         self.is_alive()
@@ -49,13 +51,12 @@ class Block(pygame.sprite.Sprite):
 
 class Tetromino:
     previous_colour = None
-    def __init__(self, game):
+    def __init__(self, game, current=True):
         self.game = game
         self.shape = random.choice(list(TETROMINOES.keys()))
         self.initialise_block_colour()
         self.blocks = [Block(self, pos, self.colour) for pos in TETROMINOES[self.shape]]
-        #self.initialise_block_colour()
-
+        self.current = current
         self.landing = False
         
 
