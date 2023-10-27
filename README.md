@@ -15,4 +15,5 @@ As shown in the following video:
 * Extract the contents of the zip folder into another folder
 * Open the extracted folder, open main.py and run the module.
 
-{% file src=".gitbook/assets/install.mp4" %}
+https://github.com/LunaTMT/Tetris/assets/44672093/ac615b3d-f41f-4f09-b370-57a0ea578cb7
+
