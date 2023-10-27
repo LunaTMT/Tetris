@@ -15,7 +15,9 @@ As shown in the following video:
 * Extract the contents of the zip folder into another folder
 * Open the extracted folder, open main.py and run the module.
 
-{% embed url="https://github.com/LunaTMT/Tetris/assets/44672093/c659de2d-9401-4bb3-b3e2-3dcf0d28ff9c" %}
+
+https://github.com/LunaTMT/Tetris/assets/44672093/13d278b3-989e-4489-b087-3bd83623b9dc
+
 
 ### Overview
 
