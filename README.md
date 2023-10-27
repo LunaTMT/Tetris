@@ -15,6 +15,16 @@ As shown in the following video:
 * Extract the contents of the zip folder into another folder
 * Open the extracted folder, open main.py and run the module.
 
+{% embed url="https://github.com/LunaTMT/Tetris/assets/44672093/c659de2d-9401-4bb3-b3e2-3dcf0d28ff9c" %}
 
-https://github.com/LunaTMT/Tetris/assets/44672093/c659de2d-9401-4bb3-b3e2-3dcf0d28ff9c
+### Overview
 
+This project only took a week to create thanks to a helpful tutorial online that introduced vectors and the use of coordinate geometry to map the tetriminos onto the playing field. There are two subtle annoyances that come up when changing the window size to large or small:&#x20;
+
+* Both the next and hold rectangles dont hold the item contained within, directly in its center.
+
+#### Future Projects&#x20;
+
+* Bubbleshooter
+* Pacman
+* Connect Four
