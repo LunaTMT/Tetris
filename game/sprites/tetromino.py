@@ -11,21 +11,29 @@ class Block(pygame.sprite.Sprite):
         self.game = tetromino.game
         self.colour = colour
         self.alive = True
+        self.default_pos = pos
         self.pos = vec(pos) + settings.INIT_POS_OFFSET
         self.next_pos = vec(pos) + settings.NEXT_POS_OFFSET
+        self.hold_pos = vec(pos) + settings.HOLD_POS_OFFSET
 
         super().__init__(tetromino.game.all_sprites)
         self.image = pygame.Surface([settings.BLOCK_WIDTH, settings.BLOCK_HEIGHT])
         pygame.draw.rect(self.image, colour, (1, 1, settings.BLOCK_WIDTH-1, settings.BLOCK_HEIGHT-1), border_radius=2)
         self.rect = self.image.get_rect()
 
-    
-
     def set_rect_pos(self):
-        pos = [self.next_pos, self.pos][self.tetromino.current]
-        self.rect.topleft = (self.game.tetris_x_start + (pos[0] * settings.BLOCK_WIDTH), pos[1] * settings.BLOCK_HEIGHT)
+        if self.tetromino.current:
+            pos = self.pos
+        else:
+            pos = self.next_pos
+        
+        if self.tetromino.hold:
+            pos = self.hold_pos
 
+        self.rect.topleft = (self.game.tetris_x_start + (pos[0] * settings.BLOCK_WIDTH), pos[1] * settings.BLOCK_HEIGHT)
+        
     def update(self):
+        
         self.is_alive()
         self.set_rect_pos()
 
@@ -51,13 +59,14 @@ class Block(pygame.sprite.Sprite):
 
 class Tetromino:
     previous_colour = None
-    def __init__(self, game, current=True):
+    def __init__(self, game, current=True, hold=False):
         self.game = game
         self.shape = random.choice(list(TETROMINOES.keys()))
         self.initialise_block_colour()
         self.blocks = [Block(self, pos, self.colour) for pos in TETROMINOES[self.shape]]
         self.current = current
         self.landing = False
+        self.hold = False
         
 
     def initialise_block_colour(self):
@@ -66,7 +75,9 @@ class Tetromino:
             self.colour = random.choice(BLOCK_COLOURS)
         self.previous_colour = self.colour
 
-        
+    def set_default_position(self):
+        for block in self.blocks:
+            block.pos = block.default_pos + settings.INIT_POS_OFFSET
     
     def is_collide(self, block_positions):
         return any(map(Block.is_collide, self.blocks, block_positions))
@@ -92,5 +103,5 @@ class Tetromino:
             self.landing = True
 
     def update(self):
-        #pass
         self.move(direction="down")
+        self.game.score += 1

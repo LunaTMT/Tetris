@@ -2,24 +2,58 @@ import pygame
 from game import colours
 from game.sprites.tetromino import Tetromino
 from game.settings import *
+from game.colours import *
 from game import settings
 import pygame.freetype as ft 
 
 class Text:
-    def __init__(self, app) -> None:
+    def __init__(self, app, game) -> None:
         self.app = app
-        self.font = ft.Font("assets/fonts/Title.ttf")
+        self.game = game
+        
+        self.font_size = int(settings.SCREEN_WIDTH * 0.05)
+        self.font = pygame.font.Font("assets/fonts/Title.ttf", self.font_size)  # You can replace "None" with a specific font file
+
+        """ TITLES """
+        """ -------"""
+        self.score = self.font.render("Score", True, WHITE) 
+        self.score_board_center_x = (game.score_border_x + (game.score_border_width/2))
+        
+        self.score_x = self.score_board_center_x - (self.score.get_width()//2)
+        self.score_y = (self.game.score_border_y - self.score.get_height()) 
+
+        self.points = self.font.render("Points", True, WHITE) 
+        self.points_x = (game.score_border_x + (game.score_border_width/2)) - (self.points.get_width()//2)
+        self.lines = self.font.render("Lines", True, WHITE) 
+        self.lines_x = (game.score_border_x + (game.score_border_width/2)) - (self.lines.get_width()//2)
+        
+        self.hold =  self.font.render("Hold", True, WHITE) 
+        self.hold_x =  (game.hold_border_x + (game.hold_border_width/2)) - (self.hold.get_width()//2)
+        self.hold_y = (self.game.hold_border_y - self.hold.get_height()) 
+        
+        
+        self.next =  self.font.render("Next", True, WHITE) 
+        self.next_x = (game.next_border_x + (game.next_border_width/2)) - (self.next.get_width()//2)
+        self.next_y = (self.game.next_border_y - self.next.get_height()) 
+        """ ------- """
+    
     
     def draw(self):
-        self.font.render_to(self.app.screen, (settings.SCREEN_WIDTH* 0.815, settings.SCREEN_HEIGHT*0.03), 
-                            text="Hold", fgcolor='white', size=settings.SCREEN_WIDTH * 0.05)
-        
-        self.font.render_to(self.app.screen, (settings.SCREEN_WIDTH* 0.815, settings.SCREEN_HEIGHT*0.53), 
-                            text="Next", fgcolor='white', size=settings.SCREEN_WIDTH * 0.05)
-        
-        self.font.render_to(self.app.screen, (settings.SCREEN_WIDTH* 0.05, settings.SCREEN_HEIGHT*0.18), 
-                            text="Score", fgcolor='white', size=settings.SCREEN_WIDTH * 0.05)
+        self.app.screen.blit(self.score, (self.score_x, self.score_y))
+        self.app.screen.blit(self.hold, (self.hold_x, self.hold_y))
+        self.app.screen.blit(self.next, (self.next_x, self.next_y))
+        self.app.screen.blit(self.points, (self.points_x, self.score_y * 1.7))
+        self.app.screen.blit(self.lines, (self.lines_x, self.score_y * 3))
 
+        self.game_score = self.font.render(str(self.game.score), True, WHITE) 
+        self.game_score_x = self.score_board_center_x - (self.game_score.get_width()//2)
+        self.game_score_y = (self.game.score_border_y + (self.game.score_border_height/2)) - (self.game_score.get_height()//2)
+        self.app.screen.blit(self.game_score, (self.game_score_x, self.game_score_y * 0.8))
+
+        self.line_score = self.font.render(str(self.game.lines), True, WHITE) 
+        self.line_score_x = self.score_board_center_x - (self.line_score.get_width()//2)
+        self.line_score_y = (self.game.score_border_y + (self.game.score_border_height/2)) - (self.line_score.get_height()//2)
+        self.app.screen.blit(self.line_score, (self.line_score_x, self.line_score_y * 1.3))
 
         
 
@@ -33,13 +67,14 @@ class GameScene:
         self.field_array = self.get_field_array()
         self.tetromino = Tetromino(self)
         self.next_tetromino = Tetromino(self, current=False)
-        self.text = Text(self.app)
+        self.hold_tetromino = None
+        self.text = Text(self.app, self)
 
         self.transparent_surface = pygame.Surface((settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT), pygame.SRCALPHA)
         self.transparent_surface.set_alpha(100)
 
-        
         self.score = 0
+        self.lines = 0
         self.is_running = True
 
     def initialise_game_borders(self):
@@ -52,23 +87,29 @@ class GameScene:
                                         settings.TETRIS_WIDTH, settings.TETRIS_HEIGHT)
         
     
-        score_border_width = self.tetris_x_start * 0.85
-        score_border_height = settings.TETRIS_HEIGHT * 0.5
-        self.score_border = pygame.Rect((self.tetris_x_start - score_border_width) // 2,
-                                       (settings.CENTER_Y - (score_border_height//2)), 
-                                       score_border_width, score_border_height)
+        self.score_border_width = self.tetris_x_start * 0.85
+        self.score_border_height = settings.TETRIS_HEIGHT * 0.5
+        self.score_border_x = (self.tetris_x_start - self.score_border_width) // 2
+        self.score_border_y = (settings.CENTER_Y - (self.score_border_height//2))
+        self.score_border = pygame.Rect(self.score_border_x,
+                                       self.score_border_y, 
+                                       self.score_border_width, self.score_border_height)
         
-        hold_border_width = self.tetris_x_start * 0.85
-        hold_border_height = settings.TETRIS_HEIGHT * 0.35
-        self.hold_border = pygame.Rect(self.tetris_x_end  + ((settings.SCREEN_WIDTH - self.tetris_x_end  - hold_border_width) // 2),
-                                       (settings.SCREEN_HEIGHT * 0.10), 
-                                       hold_border_width, hold_border_height)
+        self.hold_border_width = self.tetris_x_start * 0.85
+        self.hold_border_height = settings.TETRIS_HEIGHT * 0.35
+        self.hold_border_x = self.tetris_x_end  + ((settings.SCREEN_WIDTH - self.tetris_x_end  - self.hold_border_width) // 2)
+        self.hold_border_y = (settings.SCREEN_HEIGHT * 0.10)
+        self.hold_border = pygame.Rect(self.hold_border_x,
+                                       self.hold_border_y, 
+                                       self.hold_border_width, self.hold_border_height)
         
-        next_border_width = self.tetris_x_start * 0.85
-        next_border_height = settings.TETRIS_HEIGHT * 0.35
-        self.next_border = pygame.Rect(self.tetris_x_end + ((settings.SCREEN_WIDTH - self.tetris_x_end - next_border_width) // 2),
-                                       (settings.SCREEN_HEIGHT * 0.6), 
-                                        next_border_width, next_border_height)
+        self.next_border_width = self.tetris_x_start * 0.85
+        self.next_border_height = settings.TETRIS_HEIGHT * 0.35
+        self.next_border_x = self.tetris_x_end + ((settings.SCREEN_WIDTH - self.tetris_x_end - self.next_border_width) // 2)
+        self.next_border_y = (settings.SCREEN_HEIGHT * 0.6)
+        self.next_border = pygame.Rect(self.next_border_x,
+                                       self.next_border_y, 
+                                       self.next_border_width, self.next_border_height)
     
     def put_tetromino_blocks_in_array(self):
         for block in self.tetromino.blocks:
@@ -117,7 +158,9 @@ class GameScene:
             if sum(map(bool, self.field_array[r])) < COLUMNS:
                 row -= 1
             else:
+                self.lines += 1
                 for c in range(COLUMNS):
+                    self.score += 10
                     self.field_array[row][c].alive = False
                     self.field_array[row][c] = 0
 
@@ -130,9 +173,29 @@ class GameScene:
             self.tetromino.move(direction='right')
         elif keys[pygame.K_DOWN]:
             self.tetromino.move(direction='down')
+            self.score += 1
+
+
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                self.tetromino.rotate()
+            elif event.key == pygame.K_h:
+                if self.hold_tetromino:
+                    self.tetromino, self.hold_tetromino = self.hold_tetromino, self.tetromino
+                    self.hold_tetromino.hold = True
+                    self.tetromino.hold = False
+                else:
+                    self.hold_tetromino = self.tetromino
+                    self.hold_tetromino.hold = True
+
+                    self.tetromino = self.next_tetromino
+                    self.tetromino.current = True
+                    self.next_tetromino = Tetromino(self, current=False)
+                
+                self.tetromino.set_default_position()
+
         
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-            self.tetromino.rotate()
         
         self.return_button.handle_event(event)
 

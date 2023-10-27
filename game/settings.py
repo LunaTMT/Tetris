@@ -32,6 +32,7 @@ BACKGROUND_COLOUR = (0,119,182)
 
 INIT_POS_OFFSET = vec(COLUMNS // 2 - 1, 0)
 NEXT_POS_OFFSET = vec(COLUMNS * 1.2, ROWS * 0.77)
+HOLD_POS_OFFSET = vec(COLUMNS * 1.2, ROWS * 0.25)
 
 ANIM_TIME_INTERVAL = 150  # milliseconds
 FAST_ANIM_TIME_INTERVAL = 15
@@ -65,7 +66,6 @@ def update_variables():
     CENTER_X = SCREEN_WIDTH//2
     CENTER_Y = SCREEN_HEIGHT//2
 
-    print(INIT_POS_OFFSET, NEXT_POS_OFFSET)
 
 
 def set_screen(width, height):
